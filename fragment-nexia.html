@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche d'identité managériale NEXIA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    :root {
+      --color-accent: #d41875;
+      --color-accent-light: #fbeaf4;
+      --color-accent-dark: #9e1056;
+      --color-text-primary: #2d2d2d;
+      --color-text-secondary: #666666;
+      --color-background-secondary: #f9f9f9;
+      --color-border-tertiary: #e0e0e0;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--color-text-primary);
+      background-color: #fdfdfd;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: #ffffff;
+      border-bottom: 1px solid var(--color-border-tertiary);
+      padding: 0 2rem;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .badge-module {
+      background: var(--color-accent-light);
+      color: var(--color-accent);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .app-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-titles h1 {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--color-text-primary);
+    }
+
+    .app-titles span {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Fullscreen Button */
+    .btn-fullscreen {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      padding: 6px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-fullscreen:hover {
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+      background: var(--color-accent-light);
+    }
+
+    .btn-fullscreen svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    /* Save Indicator */
+    .save-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      min-width: 110px;
+      justify-content: flex-end;
+    }
+
+    .save-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4caf50;
+      transition: background 0.3s;
+    }
+
+    .save-dot.saving {
+      background: #f97316;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Main Grid */
+    main {
+      flex: 1;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+      background: #fdfdfd;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 1.25rem;
+      }
+      header {
+        padding: 0 1.25rem;
+      }
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .card.flex-1 {
+      flex: 1;
+    }
+
+    .card h2 {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--color-accent);
+      margin: 0;
+    }
+
+    .consigne {
+      font-size: 12.5px;
+      color: var(--color-text-secondary);
+      line-height: 1.45;
+    }
+
+    .rubrique-reference {
+      background: var(--color-background-secondary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .rubrique-reference ol {
+      list-style-type: decimal;
+      list-style-position: inside;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      resize: none;
+      box-sizing: border-box;
+      background: #ffffff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 2px var(--color-accent-light);
+    }
+
+    .axe-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-top: 0.5rem;
+    }
+
+    .axe-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-accent-dark);
+      margin-bottom: 4px;
+    }
+
+    .char-count {
+      font-size: 10px;
+      color: #9ca3af;
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* Footer / Export Zone */
+    footer {
+      height: 72px;
+      background: var(--color-background-secondary);
+      border-top: 1px solid var(--color-border-tertiary);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1rem;
+      position: sticky;
+      bottom: 0;
+      z-index: 20;
+    }
+
+    .footer-label {
+      margin-right: auto;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:hover {
+      opacity: 0.88;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid var(--color-border-tertiary);
+      color: var(--color-text-primary);
+    }
+
+    .btn-primary {
+      background: var(--color-accent);
+      color: #ffffff;
+    }
+
+    /* Print only element hiding for screen */
+    .print-only {
+      display: none;
+    }
+
+    /* Print stylesheet */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        height: auto !important;
+        min-height: 0 !important;
+      }
+      main {
+        display: block !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .column {
+        display: block !important;
+      }
+      .card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-bottom: 2rem !important;
+        break-inside: avoid;
+      }
+      .card h2 {
+        font-size: 1.15rem !important;
+        color: #000000 !important;
+        border-bottom: 1.5px solid #cccccc !important;
+        padding-bottom: 4px !important;
+        margin-bottom: 8px !important;
+      }
+      .consigne,
+      .rubrique-reference,
+      .char-count,
+      textarea {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+        white-space: pre-wrap !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 4px !important;
+        padding: 12px !important;
+        font-size: 11pt !important;
+        line-height: 1.5 !important;
+        color: #111111 !important;
+        background: #fafafa !important;
+        margin-bottom: 1rem !important;
+      }
+      .print-header {
+        display: block !important;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 0.75rem;
+      }
+      .print-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+      .print-header p {
+        font-size: 0.9rem;
+        color: #555555;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Print Header -->
+  <div class="print-only print-header">
+    <h1>Fiche d'identité managériale — NEXIA</h1>
+    <p id="print-date">Module 1 — Livrable de formation</p>
+  </div>
+
+  <!-- Screen Header -->
+  <header class="no-print">
+    <div class="header-left">
+      <div class="badge-module">Module 1</div>
+      <div class="app-titles">
+        <h1>Fiche d'identité managériale</h1>
+        <span>Livrable M1 — NEXIA</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button id="btn-fullscreen" class="btn-fullscreen" type="button" aria-label="Passer en plein écran">
+        <svg id="fullscreen-icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+        <svg id="fullscreen-icon-compress" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+        </svg>
+        <span id="fullscreen-text">Plein écran</span>
+      </button>
+
+      <div class="save-indicator" aria-live="polite">
+        <div id="save-dot" class="save-dot"></div>
+        <span id="save-text">Sauvegardé</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content : 2-column minimalist grid -->
+  <main>
+    <!-- Left Column -->
+    <div class="column">
+      <!-- Rubrique 1 -->
+      <section id="r1" aria-labelledby="t1" class="card">
+        <h2 id="t1">1. Mon rôle chez NEXIA</h2>
+        <p class="consigne">
+          Décrivez votre périmètre de responsabilité dans la situation NEXIA. Précisez vos trois missions principales dans ce contexte.
+        </p>
+        <div class="field-container">
+          <label for="role-input" class="sr-only">Description de votre rôle</label>
+          <textarea id="role-input" rows="6" placeholder=""></textarea>
+          <div id="print-role" class="print-only">Non rempli</div>
+        </div>
+      </section>
+
+      <!-- Rubrique 2 -->
+      <section id="r2" aria-labelledby="t2" class="card">
+        <h2 id="t2">2. Les idées reçues à surveiller</h2>
+        <p class="consigne">
+          Identifiez les 2 ou 3 idées reçues qui pourraient influencer votre propre posture. Expliquez comment elles pourraient se manifester dans votre management.
+        </p>
+        
+        <div class="rubrique-reference">
+          <ol>
+            <li>Un bon manager est d'abord un bon expert</li>
+            <li>Manager c'est décider seul</li>
+            <li>Un bon manager est apprécié de tous</li>
+            <li>Le management ça s'improvise</li>
+            <li>Manager c'est contrôler</li>
+          </ol>
+        </div>
+
+        <div class="field-container">
+          <label for="idees-input" class="sr-only">Vos réflexions sur les idées reçues</label>
+          <textarea id="idees-input" rows="7" placeholder=""></textarea>
+          <div id="print-idees" class="print-only">Non rempli</div>
+        </div>
+      </section>
+
+      <!-- Rubrique 3 -->
+      <section id="r3" aria-labelledby="t3" class="card">
+        <h2 id="t3">3. Mon style naturel et mes forces</h2>
+        <p class="consigne">
+          Décrivez votre style dominant et ses forces. Mettez-les en lien avec l'équipe NEXIA et justifiez vos réponses. Pour quels collaborateurs votre style est-il un atout ? Pour lesquels devrez-vous l'ajuster ?
+        </p>
+        <div class="field-container">
+          <label for="style-input" class="sr-only">Diagnostic de style et forces</label>
+          <textarea id="style-input" rows="6" placeholder=""></textarea>
+          <div id="print-style" class="print-only">Non rempli</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right Column -->
+    <div class="column">
+      <!-- Rubrique 4 -->
+      <section id="r4" aria-labelledby="t4" class="card">
+        <h2 id="t4">4. Mes 2 axes de développement</h2>
+        <p class="consigne">
+          Formulez 2 axes concrets, en lien avec les défis de l'équipe NEXIA.
+        </p>
+        
+        <div class="axe-group">
+          <div>
+            <label for="axe1-input" class="axe-label">Axe 1</label>
+            <textarea
+              id="axe1-input"
+              rows="3"
+              placeholder="Ex : Je dois développer ma capacité à [action] avec [collaborateur] afin de [résultat attendu]."
+              maxlength="500"
+            ></textarea>
+            <div id="count-axe1" class="char-count no-print">0 / 500</div>
+            <div id="print-axe1" class="print-only">Non rempli</div>
+          </div>
+
+          <div>
+            <label for="axe2-input" class="axe-label">Axe 2</label>
+            <textarea
+              id="axe2-input"
+              rows="3"
+              placeholder="Ex : Je dois développer ma capacité à [action] avec [collaborateur] afin de [résultat attendu]."
+              maxlength="500"
+            ></textarea>
+            <div id="count-axe2" class="char-count no-print">0 / 500</div>
+            <div id="print-axe2" class="print-only">Non rempli</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rubrique 5 -->
+      <section id="r5" aria-labelledby="t5" class="card flex-1">
+        <h2 id="t5">5. Ma vision du rôle d'interface</h2>
+        <p class="consigne">
+          Comment concevez-vous votre rôle entre l'équipe NEXIA et la direction ? Qu'est-ce que vous vous engagez à faire remonter ? À quelle fréquence ? Avec quelle posture ?
+        </p>
+        <div class="field-container">
+          <label for="vision-input" class="sr-only">Votre conception du rôle d'interface</label>
+          <textarea id="vision-input" rows="9" placeholder=""></textarea>
+          <div id="print-vision" class="print-only">Non rempli</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Export Footer -->
+  <footer class="no-print">
+    <p class="footer-label">Exporter ma fiche :</p>
+    <button id="btn-export-pdf" type="button" class="btn btn-secondary">
+      Télécharger en PDF
+    </button>
+    <button id="btn-export-word" type="button" class="btn btn-primary">
+      Télécharger en Word
+    </button>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'nexia_identity_sheet';
+
+      const inputs = {
+        role: document.getElementById('role-input'),
+        ideesRecues: document.getElementById('idees-input'),
+        styleForces: document.getElementById('style-input'),
+        axe1: document.getElementById('axe1-input'),
+        axe2: document.getElementById('axe2-input'),
+        visionInterface: document.getElementById('vision-input')
+      };
+
+      const prints = {
+        role: document.getElementById('print-role'),
+        ideesRecues: document.getElementById('print-idees'),
+        styleForces: document.getElementById('print-style'),
+        axe1: document.getElementById('print-axe1'),
+        axe2: document.getElementById('print-axe2'),
+        visionInterface: document.getElementById('print-vision')
+      };
+
+      const counts = {
+        axe1: document.getElementById('count-axe1'),
+        axe2: document.getElementById('count-axe2')
+      };
+
+      const saveDot = document.getElementById('save-dot');
+      const saveText = document.getElementById('save-text');
+      let saveTimeout = null;
+
+      function updateFieldDisplay(key, value) {
+        if (prints[key]) {
+          prints[key].textContent = value.trim() ? value : 'Non rempli';
+        }
+        if (counts[key]) {
+          counts[key].textContent = value.length + ' / 500';
+        }
+      }
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const data = JSON.parse(raw);
+            Object.keys(inputs).forEach(function (k) {
+              if (data[k] !== undefined && inputs[k]) {
+                inputs[k].value = data[k];
+                updateFieldDisplay(k, data[k]);
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Erreur lors du chargement de la sauvegarde:', e);
+        }
+      }
+
+      function saveData() {
+        saveDot.classList.add('saving');
+        saveText.textContent = 'Sauvegarde…';
+
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(function () {
+          try {
+            const data = {};
+            Object.keys(inputs).forEach(function (k) {
+              data[k] = inputs[k].value;
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          } catch (e) {
+            console.error('Erreur de sauvegarde locale:', e);
+          }
+          saveDot.classList.remove('saving');
+          saveText.textContent = 'Sauvegardé';
+        }, 350);
+      }
+
+      Object.keys(inputs).forEach(function (k) {
+        const el = inputs[k];
+        if (!el) return;
+        el.addEventListener('input', function () {
+          updateFieldDisplay(k, el.value);
+          saveData();
+        });
+      });
+
+      const btnFullscreen = document.getElementById('btn-fullscreen');
+      const iconExpand = document.getElementById('fullscreen-icon-expand');
+      const iconCompress = document.getElementById('fullscreen-icon-compress');
+      const fullscreenText = document.getElementById('fullscreen-text');
+
+      function isFullscreen() {
+        return Boolean(
+          document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement
+        );
+      }
+
+      function updateFullscreenUI() {
+        if (isFullscreen()) {
+          iconExpand.style.display = 'none';
+          iconCompress.style.display = 'inline-block';
+          fullscreenText.textContent = 'Quitter plein écran';
+          btnFullscreen.setAttribute('aria-label', 'Quitter le mode plein écran');
+        } else {
+          iconExpand.style.display = 'inline-block';
+          iconCompress.style.display = 'none';
+          fullscreenText.textContent = 'Plein écran';
+          btnFullscreen.setAttribute('aria-label', 'Passer en plein écran');
+        }
+      }
+
+      btnFullscreen.addEventListener('click', function () {
+        if (!isFullscreen()) {
+          const docElm = document.documentElement;
+          if (docElm.requestFullscreen) {
+            docElm.requestFullscreen();
+          } else if (docElm.webkitRequestFullscreen) {
+            docElm.webkitRequestFullscreen();
+          } else if (docElm.mozRequestFullScreen) {
+            docElm.mozRequestFullScreen();
+          } else if (docElm.msRequestFullscreen) {
+            docElm.msRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        }
+      });
+
+      ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(function (evt) {
+        document.addEventListener(evt, updateFullscreenUI);
+      });
+
+      const btnExportPdf = document.getElementById('btn-export-pdf');
+      btnExportPdf.addEventListener('click', function () {
+        const printDateEl = document.getElementById('print-date');
+        if (printDateEl) {
+          const today = new Date().toLocaleDateString('fr-FR');
+          printDateEl.textContent = 'Module 1 — ' + today;
+        }
+        window.print();
+      });
+
+      const btnExportWord = document.getElementById('btn-export-word');
+      btnExportWord.addEventListener('click', async function () {
+        const docxLib = window.docx;
+        const saveAsLib = window.saveAs;
+
+        if (!docxLib || !saveAsLib) {
+          alert("Le module d'exportation Word est en cours de chargement. Veuillez patienter un instant.");
+          return;
+        }
+
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docxLib;
+
+        function createRubriqueDoc(num, title, content) {
+          return [
+            new Paragraph({
+              text: 'Rubrique ' + num + ' — ' + title,
+              heading: HeadingLevel.HEADING_2,
+              spacing: { before: 360, after: 160 }
+            }),
+            new Paragraph({
+              children: (content || 'Non rempli').split('\n').map(function (line, i, arr) {
+                return new TextRun({
+                  text: line,
+                  break: i < arr.length - 1 ? 1 : 0
+                });
+              }),
+              spacing: { after: 240 }
+            })
+          ];
+        }
+
+        try {
+          const today = new Date().toLocaleDateString('fr-FR');
+          const dateISO = new Date().toISOString().split('T')[0];
+
+          const doc = new Document({
+            sections: [
+              {
+                properties: {},
+                children: [
+                  new Paragraph({
+                    text: "Fiche d'identité managériale — NEXIA",
+                    heading: HeadingLevel.TITLE,
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 160 }
+                  }),
+                  new Paragraph({
+                    text: 'Module 1 — ' + today,
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 400 }
+                  }),
+                  ...createRubriqueDoc(1, 'Mon rôle chez NEXIA', inputs.role.value),
+                  ...createRubriqueDoc(2, 'Les idées reçues que je dois surveiller', inputs.ideesRecues.value),
+                  ...createRubriqueDoc(3, 'Mon style naturel et mes forces', inputs.styleForces.value),
+                  ...createRubriqueDoc(4, 'Mes 2 axes de développement prioritaires', 'Axe 1:\n' + (inputs.axe1.value || 'Non rempli') + '\n\nAxe 2:\n' + (inputs.axe2.value || 'Non rempli')),
+                  ...createRubriqueDoc(5, "Ma vision du rôle d'interface", inputs.visionInterface.value)
+                ]
+              }
+            ]
+          });
+
+          const blob = await Packer.toBlob(doc);
+          saveAsLib(blob, 'Fiche_Identite_Manageriale_NEXIA_' + dateISO + '.docx');
+        } catch (err) {
+          console.error("Erreur lors de l'export Word:", err);
+          alert("Une erreur s'est produite lors de la génération du fichier Word.");
+        }
+      });
+
+      loadData();
+    })();
+  </script>
+</body>
+</html>

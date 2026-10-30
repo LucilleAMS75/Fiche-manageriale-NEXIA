@@ -1,0 +1,6 @@
+{
+  "name": "Fiche d'identité managériale NEXIA",
+  "description": "Application interactive pour remplir et exporter la fiche d'identité managériale du Module 1 de la formation NEXIA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
